@@ -6,97 +6,76 @@ A robust, distribution-agnostic approach to clean skewed data using Interquartil
 🐍 Python • 🐼 Pandas • 📓 Jupyter • 📈 Matplotlib • 🎨 Seaborn
 
 📌 Overview
-This project demonstrates a statistical, non-parametric method to detect and handle outliers in real-world datasets using the Interquartile Range (IQR) technique. Unlike mean- and standard deviation-based methods, IQR is resistant to skewness — making it ideal for financial or income-type data.
+This project demonstrates a statistical, non-parametric method to detect and handle outliers in real-world datasets using the Interquartile Range (IQR) technique. Unlike methods based on mean and standard deviation, IQR relies on quartiles and is highly resistant to skewness — making it especially well-suited for financial or income-type data.
 
-The included Jupyter Notebook walks you through:
+The included Jupyter Notebook guides you through a complete workflow:
 
-📊 Visualizing data with histograms & box plots
-📐 Calculating Q₁, Q₃, and IQR
-🚧 Defining outlier boundaries using the 1.5 × IQR rule
-🧹 Applying two handling strategies:
-&nbsp;&nbsp;&nbsp;&nbsp;• Trimming: Remove outlier records
-&nbsp;&nbsp;&nbsp;&nbsp;• Capping (Winsorization): Replace outliers with boundary values
-🔍 Comparing before vs. after distributions
+📊 Visualizing the original data distribution using histograms and box plots
+📐 Computing the first quartile (Q₁), third quartile (Q₃), and the IQR
+🚧 Establishing outlier boundaries using the standard 1.5 × IQR rule
+🧹 Applying two widely used outlier treatment strategies:
+&nbsp;&nbsp;&nbsp;&nbsp;• Trimming: Removing records that fall outside the valid range
+&nbsp;&nbsp;&nbsp;&nbsp;• Capping (Winsorization): Replacing extreme values with the nearest boundary limits
+🔍 Comparing the data distribution before and after treatment to assess impact
 
 📥 Installation
-Install the required Python libraries using pip:
+All required libraries can be installed via pip:
 
 pip install pandas numpy seaborn matplotlib
 
-💡 Tip: Use a virtual environment to avoid dependency conflicts!
+💡 Tip: It’s recommended to use a virtual environment to keep dependencies isolated and avoid conflicts.
 
 📁 Dataset
-File: Outlier.csv
-Target Column: income (numerical, right-skewed)
-Skewness: ≈ 1.027 → confirms positive (right) skew
+The analysis uses a dataset named Outlier.csv, with a focus on the income column — a numerical feature known for high skewness.
 
-💰 Income data often contains extreme high values — perfect for IQR-based cleaning!
+Skewness: Approximately 1.027
+Interpretation: Strong positive (right) skew, typical of real-world income data
+💰 Such distributions often contain extreme high-end values, making them ideal candidates for IQR-based outlier detection.
 
 📐 IQR Method Explained
-The Interquartile Range (IQR) is the spread between the 25th and 75th percentiles:
+The Interquartile Range (IQR) measures the spread of the middle 50% of the data, calculated as the difference between the 75th percentile (Q₃) and the 25th percentile (Q₁).
 
-IQR = Q₃ − Q₁
-
-Outliers are defined as values outside these statistical fences:
+Outliers are identified as any values falling below the lower fence or above the upper fence, defined as:
 
 Upper Limit = Q₃ + 1.5 × IQR
 Lower Limit = Q₁ − 1.5 × IQR
-
 🔢 Calculated Boundaries for income
-For the income column, we computed the following statistical thresholds using the IQR method:
+Using the dataset, the following thresholds were derived:
 
 Q₁ (25th percentile): 32,752.5
 Q₃ (75th percentile): 115,406.5
-IQR (Interquartile Range): 82,654.0
-Upper Limit (Q₃ + 1.5 × IQR): 239,387.5
-Lower Limit (Q₁ − 1.5 × IQR): −91,228.5
-
-⚠️ Since income values cannot be negative in this context, only data points above 239,387.5 are treated as outliers.
+IQR: 82,654.0
+Upper Limit: 239,387.5
+Lower Limit: −91,228.5
+⚠️ Since income cannot be negative in this context, only values exceeding the upper limit are considered outliers.
 
 🧹 Outlier Handling Techniques
 
 ✂️ Trimming (Removal)
-Remove rows where income exceeds the upper limit.
-Outliers detected: 77 rows
+This approach removes all records where income lies beyond the statistical boundaries. In this dataset, 77 outlier records were identified and excluded.
 
-We create a new DataFrame by keeping only rows where income is within the calculated limits:
-df_changed = df[(df['income'] < upper_limit) & (df['income'] > lower_limit)]
-
-❌ Pros: Simple
-❌ Cons: Reduces sample size — may lose valuable data
+❌ Pros: Simple and straightforward
+❌ Cons: Reduces overall sample size, which may impact downstream analysis or model performance
 
 🧢 Capping (Winsorization)
-Replace extreme values with boundary limits — preserves dataset size!
-We assign a new column in the DataFrame using nested np.where logic:
-df_new['income'] = np.where(
-&nbsp;&nbsp;&nbsp;&nbsp;df['income'] > upper_limit,
-&nbsp;&nbsp;&nbsp;&nbsp;upper_limit,
-&nbsp;&nbsp;&nbsp;&nbsp;np.where(
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;df['income'] < lower_limit,
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lower_limit,
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;df['income']
-&nbsp;&nbsp;&nbsp;&nbsp;)
-)
+Instead of deletion, extreme values are replaced with the nearest boundary value — preserving the total number of observations while limiting the influence of outliers.
 
-✅ Best practice for ML pipelines — avoids data loss while taming extremes!
+✅ Best practice for machine learning and statistical modeling, as it maintains data integrity without discarding records.
 
 📈 Visualization Results
-The notebook includes a 2×2 comparison grid:
+The notebook presents a side-by-side comparison of data distributions:
 
-📦 Before: Box plot with long upper whiskers & outlier dots
-📏 After: Clean box plot — outliers removed or capped
-📊 Before: Right-skewed histogram
-📉 After: More symmetric, model-friendly distribution
+📦 Before treatment: Box plots show numerous high-end outliers; histograms reveal strong right skew
+📏 After treatment: Outliers are either removed or pulled back to the boundary, resulting in a cleaner, more symmetric distribution
 
-✅ Result: Cleaner data → more stable models and reliable insights!
+✅ The result is a refined dataset that supports more stable, accurate, and reliable modeling outcomes.
 
 🚀 Ready to Run?
-• Clone this repo
-• Install dependencies
+• Clone this repository
+• Install the required dependencies
 • Open Outlier_Detection_IQR.ipynb in Jupyter
-• Run cells and explore!
+• Execute the notebook to explore the full analysis
 
 📬 Feedback & Contributions
-Found a bug? Have an idea?
-👉 Open an issue or submit a PR! All contributions welcome! 🤝
-
+Found an issue? Have a suggestion for improvement?
+👉 Open an issue or submit a pull request — all contributions are welcome! 🤝
